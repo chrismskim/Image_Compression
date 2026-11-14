@@ -146,7 +146,7 @@ We do not use NumPy's built-in SVD routine to construct the decomposition. The b
 
 The complete mathematical derivations, assumptions, algorithms, and experimental results are documented in our Overleaf report.
 
-[View Iteration 2 Final Report](docs/Iteration2_Final_Report.pdf)
+[View Iteration 2 Final Report](docs/DS5020_Iteration2_Report.pdf)
 
 ## Submission
 
