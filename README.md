@@ -7,7 +7,7 @@
 ## Team Members
 
 - **Minseong Kim** — Iteration 2 project leader
-- **Vaenkatakrishnan Srinivasan** — Team member
+- **Vaenkatakrishnan Srinivasan** — Iteration 3 Project Leader
 
 ## Project Overview
 
@@ -91,4 +91,5 @@ The smallest rank retaining at least 95% of the energy is **15**. Rank 14 retain
 ## Reports and Project Plan
 
 - [Iteration 2 report](docs/DS5020_Iteration2_Report.pdf)
+- [Iteration 3 Report](docs/DS5020_Iteration3_Report.pdf)
 - [Project plan](docs/DS5020_Project_Plan.xlsx)
