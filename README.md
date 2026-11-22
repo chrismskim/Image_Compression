@@ -1,159 +1,94 @@
-# DS5020 Final Project — Iteration 2
+# DS5020 Final Project — Image Compression with SVD
 
-**Project Title:** Image Compression and Reconstruction Using Singular Value Decomposition (SVD)  
+**Project title:** Image Compression and Reconstruction Using Singular Value Decomposition (SVD)  
 **Course:** DS5020 – Introduction to Linear Algebra  
 **Semester:** Fall 2026
 
 ## Team Members
 
-- **Minseong Kim** — Project Leader
-- **Vaenkatakrishnan Srinivasan** — Team Member
+- **Minseong Kim** — Iteration 2 project leader
+- **Vaenkatakrishnan Srinivasan** — Team member
 
 ## Project Overview
 
-This project explores image compression and reconstruction using Singular Value Decomposition (SVD). We implement an SVD-based algorithm using Python and NumPy to decompose grayscale images and construct low-rank approximations.
+We use the singular value decomposition to reconstruct a grayscale image at different ranks. We measure how the number of retained singular components affects reconstruction error, energy retention, and the number of scalars needed to store the approximation.
 
-We evaluate reconstruction errors, compression ratios, storage requirements, and energy retention at different rank values.
-
-Our goal is to understand how the number of retained singular values affects image quality and storage efficiency.
-
-## Roles and Responsibilities
-
-| Task | Owner | Checker |
-|---|---|---|
-| Q1–Q3: SVD mathematical proofs | Vaenkatakrishnan Srinivasan | Minseong Kim |
-| Q4–Q5: Frobenius norm, reconstruction error, storage cost | Minseong Kim | Vaenkatakrishnan Srinivasan |
-| SVD implementation and mathematical algorithm | Vaenkatakrishnan Srinivasan | Minseong Kim |
-| Real-image analysis and visualization | Minseong Kim | Vaenkatakrishnan Srinivasan |
-| Simulation, definitions, and report integration | Both | Both |
-
-## Project Structure
-
-```text
-Image-Compression-SVD/
-├── data/
-│   └── grace_hopper.jpg
-├── docs/
-│   ├── Iteration2_Final_Report.pdf
-│   ├── DS5020_Project_Plan.xlsx
-│   ├── real_image_results.csv
-│   └── simulation_results.csv
-├── figures/
-│   ├── real_energy.png
-│   ├── real_reconstructions.png
-│   ├── simulation_error.png
-│   └── simulation_spectrum.png
-├── src/
-│   ├── load_image.py
-│   ├── simulate.py
-│   └── svd_core.py
-├── tests/
-│   └── test_svd.py
-├── README.md
-└── requirements.txt
-```
+In **Iteration 2**, we derived the mathematical identities and evaluated them on a synthetic matrix and a real image. In **Iteration 3**, we implemented the SVD using power iteration with deflation and verified it on an exact worked example, a seeded simulation, and the Grace Hopper photograph.
 
 ## Installation
 
-Install Python 3.10 or later and the required libraries.
+Run these commands from the repository root in Windows PowerShell. If you already have a `.venv` with the dependencies installed, skip to the run commands.
 
-```bash
-python3 -m pip install -r requirements.txt
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-## Running the Project
+## Running Iteration 3
 
-### 1. Rank-5 Simulation
-
-Generate a synthetic matrix with a rank-5 signal and Gaussian noise.
-
-```bash
-python3 src/simulate.py
+```powershell
+.\.venv\Scripts\python.exe .\src\small_example.py
+.\.venv\Scripts\python.exe .\src\check_simulation.py
+.\.venv\Scripts\python.exe .\src\run_real.py
 ```
 
-The simulation verifies the theoretical properties of SVD, including reconstruction errors, singular values, and orthonormality.
+| Script | What it does |
+|---|---|
+| `src/small_example.py` | Prints the SVD steps for the assigned 2 × 2 matrix and verifies the rank-1 approximation using exact fractions and substitution. |
+| `src/check_simulation.py` | Checks rank 5 against NumPy, runs the rank-8 convergence stress test, and measures signal subspace recovery at three sample sizes. |
+| `src/run_real.py` | Reconstructs the Grace Hopper image at the required ranks, checks the results against NumPy, and plots retained energy. |
 
-### 2. Real Image Analysis
+Run the repository’s existing unit tests with:
 
-Apply SVD-based compression to a grayscale image.
-
-```bash
-python3 src/load_image.py
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-The script generates reconstructed images at different rank values and calculates reconstruction errors, compression ratios, and energy retention.
+## Iteration 3 Results
 
-### 3. Run Tests
+### Worked Example
 
-```bash
-python3 -m unittest discover -s tests -v
-```
+For the assigned matrix `[[3, 0], [4, 5]]`, the Gram eigenvalues are **45** and **5**, giving singular values \(3\sqrt{5}\) and \(\sqrt{5}\). The rank-1 approximation has rows `[1.5, 1.5]` and `[4.5, 4.5]`. Its squared Frobenius error is exactly **5**, equal to the square of the discarded singular value.
 
-## Dataset
+### Rank-5 Simulation
 
-We use the Grace Hopper sample photograph provided by Matplotlib.
+The baseline is a **120 × 80** matrix with a rank-5 signal, Gaussian noise with standard deviation **0.01**, and random seed **0**. The rank-5 squared reconstruction error and discarded spectral energy both round to **0.873022217597**.
 
-The original RGB image is converted to grayscale and represented as a matrix of size 600 × 512.
+| Comparison with NumPy | Maximum absolute difference |
+|---|---:|
+| Top five singular values | 8.527 × 10⁻¹⁴ |
+| Left singular vectors after sign alignment | 5.110 × 10⁻¹³ |
+| Right singular vectors after sign alignment | 4.780 × 10⁻¹³ |
+| Squared reconstruction error vs. discarded energy | 1.110 × 10⁻¹⁵ |
 
-Each matrix entry represents the intensity of a pixel.
+The rank-8 stress test probes the closely spaced singular values in the noise spectrum. The sample-size experiment holds the number of columns fixed at 80. Across eight seeds, the median right-subspace error was **2.994 × 10⁻³** at 120 rows, **1.458 × 10⁻³** at 480 rows, and **7.371 × 10⁻⁴** at 1,920 rows.
 
-## Simulation
+### Real Image
 
-We generate a 120 × 80 matrix with a rank-5 signal and Gaussian noise using a fixed random seed of 0.
+We use the Grace Hopper sample photograph from Matplotlib. We convert the RGB image to grayscale and scale it to \([0,1]\), giving a **600 × 512** matrix with **307,200** pixel values.
 
-We evaluate the reconstruction at ranks 1, 3, 5, and 10.
+| Rank | Energy retained | Stored scalars |
+|---:|---:|---:|
+| 5 | 87.9961% | 5,565 |
+| 15 | 95.1240% | 16,695 |
+| 20 | 96.3187% | 22,260 |
+| 50 | 98.8120% | 55,650 |
 
-| Rank | Squared Reconstruction Error | Stored Values |
-|---|---:|---:|
-| 1 | 30,397.1176 | 201 |
-| 3 | 11,318.1041 | 603 |
-| 5 | 0.8730 | 1,005 |
-| 10 | 0.7077 | 2,010 |
+The smallest rank retaining at least 95% of the energy is **15**. Rank 14 retains **94.7804%**. At rank 15, the original-to-factor storage ratio is **18.40×**, measured by scalar counts. The top 50 singular values agreed with NumPy to a maximum absolute difference of **7.105 × 10⁻¹⁴**.
 
-The results demonstrate that increasing the approximation rank reduces reconstruction error.
+## Iteration 3 Figures
 
-## Real Image Results
-
-We evaluate the relationship between rank, energy retention, and compression ratio.
-
-| Rank | Energy Retention | Compression Ratio |
-|---|---:|---:|
-| 5 | 88.00% | 55.20× |
-| 10 | 92.97% | 27.60× |
-| 20 | 96.32% | 13.80× |
-| 40 | 98.38% | 6.90× |
-
-The minimum rank required to retain at least 95% of the image's Frobenius energy is **15**.
-
-Compression ratios represent theoretical storage savings based on the number of stored scalar values, rather than actual encoded image file sizes.
-
-## Visualizations
-
-The `figures/` folder contains:
-
-- `real_reconstructions.png` — Original and reconstructed images at different ranks.
-- `real_energy.png` — Energy retention versus rank.
-- `simulation_spectrum.png` — Singular value spectrum of the simulated matrix.
-- `simulation_error.png` — Reconstruction error comparison.
+- [Rank-5 recovery versus sample size](figures/iteration3_simulation_sample_size.png)
+- [Grace Hopper rank-k reconstructions](figures/iteration3_real_reconstructions.png)
+- [Grace Hopper retained energy](figures/iteration3_real_energy.png)
 
 ## Implementation Notes
 
-Our implementation constructs SVD from the eigendecomposition of the Gram matrix using `numpy.linalg.eigh`.
+- `src/methods.py` implements the Iteration 3 SVD using power iteration with deflation on the Gram matrix. The verification scripts use `numpy.linalg.svd` as a reference.
+- `src/simulate.py` provides `simulate_low_rank()` for the Iteration 3 checks and can still run the original Iteration 2 simulation.
+- `src/svd_core.py` contains the Iteration 2 implementation, which uses `numpy.linalg.eigh`. `src/load_image.py` runs the original Iteration 2 image analysis.
 
-We do not use NumPy's built-in SVD routine to construct the decomposition. The built-in routine is used only for numerical comparison.
+## Reports and Project Plan
 
-## Final Report
-
-The complete mathematical derivations, assumptions, algorithms, and experimental results are documented in our Overleaf report.
-
-[View Iteration 2 Final Report](docs/DS5020_Iteration2_Report.pdf)
-
-## Submission
-
-The final project deliverables consist of:
-
-- Overleaf report containing mathematical definitions, assumptions, Q1–Q5 derivations, algorithms, and simulation results.
-- GitHub repository containing Python code, data, figures, and documentation.
-- Updated Excel Project Plan.
-
-Each team member submits the GitHub repository link and Overleaf read-only link individually through Canvas.
+- [Iteration 2 report](docs/DS5020_Iteration2_Report.pdf)
+- [Project plan](docs/DS5020_Project_Plan.xlsx)
